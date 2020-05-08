@@ -4,8 +4,6 @@ Plugin Name: WooCommerce Ceca Gateway
 Plugin URI: http://woothemes.com/woocommerce
 Description: Extends WooCommerce with an Ceca gateway.
 Version: 1.0
-Author: juanmirod
-Author URI: http://juanmirodriguez.es/
  
 License: GNU General Public License v3.0
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -202,7 +200,7 @@ function woocommerce_gateway_ceca_init() {
         function calculate_sign ( $order ) {
 
             // Clave_encriptacion+MerchantID+AcquirerBIN+TerminalID+Num_operacion+Importe+
-            // TipoMoneda+Exponente+“SHA1”+URL_OK+URL_NOK
+            // TipoMoneda+Exponente+“SHA2”+URL_OK+URL_NOK
             $signature_str = $this->password
                 .$this->merchand_id
                 .$this->acquirer_bin
@@ -210,11 +208,11 @@ function woocommerce_gateway_ceca_init() {
                 .$order->id
                 .$order->get_total()*100
                 .$this->currency
-                .'2SHA1'
+                .'2SHA2'
                 .$this->get_return_url( $order )
                 .get_permalink( woocommerce_get_page_id( 'checkout' ) );
 
-            return sha1($signature_str);
+            return hash('sha256', $signature_str);
         }
 
         function get_ceca_args( $order ) {
@@ -226,7 +224,7 @@ function woocommerce_gateway_ceca_init() {
             $result['URL_OK']           = $this->get_return_url( $order );
             $result['URL_NOK']          = get_permalink( woocommerce_get_page_id( 'checkout' ) );
             $result['Firma']            = $this->calculate_sign( $order );
-            $result['Cifrado']          = 'SHA1';
+            $result['Cifrado']          = 'SHA2';
             $result['Num_operacion']    = $order->id;
             $result['Importe']          = $order->get_total()*100;
             $result['TipoMoneda']       = $this->currency;
@@ -257,21 +255,12 @@ function woocommerce_gateway_ceca_init() {
                 $ceca_args_array[] = '<input type="hidden" name="'.esc_attr( $key ) . '" value="' . esc_attr( $value ) . '" />';
             }
 
-       /*     wc_enqueue_js( '
-   if (alert ("Gracias por su pedido, recuerde que debe introducir la fecha de caducidad de su tarjeta en formato AAAAMM. Por ejemplo, si su tarjeta caduca en Julio de 2015, debera introducir 201507 como fecha de caducidad. Gracias.")){ ; 
-jQuery("#submit_ceca_payment_form").click();       
-}
-            ' );
-*/
             return '<form action="' . esc_url( $this->ceca_url ) . '" method="post" id="ceca_payment_form" target="_top">
                     ' . implode( '', $ceca_args_array ) . '
                     <!-- Button Fallback -->
                     <div class="payment_buttons">
                         <input type="submit" class="button alt" id="submit_ceca_payment_form" value="' . __( 'Pagar' ) . '" /> <a class="button cancel" href="' . esc_url( $order->get_cancel_order_url() ) . '">' . __( 'Cancel order &amp; restore cart', 'woocommerce' ) . '</a>
                     </div>
-                    <script type="text/javascript">
-                        //jQuery(".payment_buttons").hide();
-                    </script>
                 </form>';
 
         }

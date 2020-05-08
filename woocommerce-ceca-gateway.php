@@ -1,9 +1,14 @@
 <?php
 /*
-Plugin Name: WooCommerce Ceca Gateway
+Plugin Name: WooCommerce Ceca Gateway SHA256
 Plugin URI: http://woothemes.com/woocommerce
 Description: Extends WooCommerce with an Ceca gateway.
 Version: 1.0
+Author: juanmirod
+Author URI: http://juanmirodriguez.es/
+Version: 1.1
+Author: kasappeal
+Author URI: https://github.com/kasappeal/
  
 License: GNU General Public License v3.0
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
